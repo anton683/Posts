@@ -1,13 +1,12 @@
 import { Grid } from "@mui/material";
-import { postData } from "../../posts";
 import { Post } from "../post";
 
-export function PostList() {
+export function PostList({ list, onPostLike, onDelete, currentUser }) {
   return (
     <>
-      <Grid container spacing={6}>
-        {postData.map((dataItem, index) => (
-          <Post key={index} {...dataItem} />
+      <Grid container spacing={6} sx={{ marginTop: 1 }}>
+        {list.map((item) => (
+          <Post key={item._id} {...item} onPostLike={onPostLike} onDelete={onDelete} currentUser={currentUser} />
         ))}
       </Grid>
     </>
