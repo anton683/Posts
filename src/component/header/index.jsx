@@ -12,10 +12,14 @@ import { Box } from "@mui/system";
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import { useContext } from 'react';
+import { UserContext } from '../../contexts/current-user-context';
 
-function Header({ user }) {
+function Header() {
+  const currentUser = useContext(UserContext)
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  
   const handleChange = (event) => {
     setAuth(event.target.checked);
   };
@@ -38,7 +42,7 @@ function Header({ user }) {
           </Typography>
             
             <Typography mr={3}>
-            {user?.name}<br />{user?.email}
+            {currentUser?.name}<br />{currentUser?.email}
           </Typography>
           {auth && (
             <div>
