@@ -1,15 +1,20 @@
 import { Container } from "@mui/system";
 import Footer from "../footer";
 import Header from "../header";
-import { PostList } from "../postList";
-import { Delete as DeleteIcon, RestoreFromTrash as RestoreFromTrashIcon } from '@mui/icons-material';
 import api from '../../utils/api';
 import { useState, useEffect } from 'react';
 import { isLiked } from '../../utils/posts';
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { MainPage } from "../../pages/mainpage";
+import { PostPage } from "../../pages/postpage";
+import { NotFoundPage } from "../../pages/notfoundpage";
+import { UserContext } from "../../contexts/current-user-context";
 
 function App() {
   const [posts, setPosts] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null)
+  const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
+  const [refresh, setRefresh] = useState(true);
 
   function handleUpdateUser(dataUserUpdate) {
     api.setUserInfo(dataUserUpdate)
@@ -32,10 +37,8 @@ function App() {
   function handlePostDelete(post) {
     api.deletePost(post._id)
       .then((updatePost) => {
-        const newPosts = posts.filter(post => {
-          return post._id !== updatePost._id;
-        })
-        setPosts(newPosts)
+        navigate(-1);
+      setRefresh((refresh) => !refresh);
 
       })
   }
@@ -49,16 +52,32 @@ function App() {
       .catch(err => console.log(err))
   }, [])
   return (
-    <>
-      <Header user={currentUser} />
+    <UserContext.Provider value={currentUser} >
+      <Header />
       <Container className="main">
-        <PostList list={posts}
-          onPostLike={handlePostLike}
-          currentUser={currentUser}
-          onDelete={handlePostDelete} />
+        <Routes>
+          <Route path="/" element={<MainPage posts={posts}
+            handlePostLike={handlePostLike}
+            handlePostDelete={handlePostDelete}
+            currentUser={currentUser}
+            navigate={navigate} 
+            />
+          }
+          />
+          <Route path="/postpage/:postID"
+              element={
+                <PostPage
+                handlePostLike={handlePostLike}
+                handlePostDelete={handlePostDelete}
+                navigate={navigate}
+                setRefresh={setRefresh}
+                />
+              }/>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
       </Container>
       <Footer />
-    </>
+    </UserContext.Provider>
   );
 }
 

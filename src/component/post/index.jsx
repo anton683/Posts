@@ -12,9 +12,12 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import dayjs from "dayjs";
 import { isLiked } from '../../utils/posts';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useContext } from "react";
+import { UserContext } from "../../contexts/current-user-context";
+import { Link } from "react-router-dom";
 
-export function Post({ author, created_at, image, title, text, likes, _id, onPostLike, onDelete, currentUser }) {
-
+export function Post({ author, created_at, image, title, text, likes, _id, onPostLike, onDelete, heightImg }) {
+  const currentUser = useContext(UserContext)
   const like = isLiked(likes, currentUser?._id)
   const canDelete = currentUser?._id === author?._id;
 
@@ -35,29 +38,33 @@ export function Post({ author, created_at, image, title, text, likes, _id, onPos
         width: "100%"
       }}>
         <CardHeader
-          avatar={<Avatar aria-label="recipe" src={author.avatar}></Avatar>}
+          avatar={<Avatar aria-label="recipe" src={author?.avatar}></Avatar>}
           action={
             <IconButton aria-label="settings" onClick={handleClickDelete}>
               <DeleteIcon />
             </IconButton>
           }
-          title={author.name}
+          title={author?.name}
           subheader={dayjs(created_at).format("DD MMM YYYY")}
         />
-        <CardMedia component="img" height="194" image={image} alt={title} />
+        <Link to={`/postpage/${_id}`} style={{ textDecoration: "none" }}>
+        <CardMedia component="img" height="194" image={image} alt={title} sx={{ height: heightImg }} />
         <CardContent>
           <Typography variant="h6" color="black">
             {title}
           </Typography>
-          <Typography paragraph>{text}</Typography>
+          <Typography paragraph variant="body2"
+              color="text.secondary" noWrap >{text}</Typography>
         </CardContent>
+        </Link>
         <CardActions disableSpacing sx={{ marginTop: "auto" }}>
           <IconButton  aria-label="add to favorites" onClick={handleClickButtonLike}>
             <FavoriteIcon sx={{ color: like ? "red" : "grey" }} />
           </IconButton>
           <Typography sx={{ marginLeft: "8px" }}>
-            {likes.length}
+            {likes?.length}
           </Typography>
+          
         </CardActions>
       </Card>
     </Grid>
