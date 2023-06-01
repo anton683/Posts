@@ -13,15 +13,9 @@ import { UserContext } from "../../contexts/current-user-context";
 function App() {
   const [posts, setPosts] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const [refresh, setRefresh] = useState(true);
-
-  function handleUpdateUser(dataUserUpdate) {
-    api.setUserInfo(dataUserUpdate)
-      .then((dataServer) => {
-        setCurrentUser(dataServer)
-      })
-  }
 
   function handlePostLike(post) {
     const like = isLiked(post.likes, currentUser._id)
@@ -36,43 +30,59 @@ function App() {
 
   function handlePostDelete(post) {
     api.deletePost(post._id)
-      .then((updatePost) => {
-        navigate(-1);
-      setRefresh((refresh) => !refresh);
+      .then(() => {
+        navigate("/");
+        setRefresh((refresh) => !refresh);
 
       })
   }
 
+  function handlePostEdit(newData) {
+    api.editPost(newData).then(() => {
+      navigate("/");
+      setRefresh((refresh) => !refresh);
+    });
+  }
+
+  function handlePostAdd(data) {
+    api
+      .addPost(data)
+      .then(() =>
+        page === 1 ? setRefresh((refresh) => !refresh) : setPage(1)
+      );
+  }
+
   useEffect(() => {
-    api.getAllInfo()
+    api.getAllInfo(page)
       .then(([postsData, userInfoData]) => {
         setCurrentUser(userInfoData);
         setPosts(postsData);
       })
       .catch(err => console.log(err))
-  }, [])
+  }, [page, refresh])
   return (
     <UserContext.Provider value={currentUser} >
-      <Header />
+      <Header onAdd={handlePostAdd} />
       <Container className="main">
         <Routes>
           <Route path="/" element={<MainPage posts={posts}
             handlePostLike={handlePostLike}
             handlePostDelete={handlePostDelete}
+            handlePostEdit={handlePostEdit}
             currentUser={currentUser}
-            navigate={navigate} 
-            />
+            navigate={navigate}
+          />
           }
           />
           <Route path="/postpage/:postID"
-              element={
-                <PostPage
-                handlePostLike={handlePostLike}
+            element={
+              <PostPage
                 handlePostDelete={handlePostDelete}
+                handlePostEdit={handlePostEdit}
                 navigate={navigate}
                 setRefresh={setRefresh}
-                />
-              }/>
+              />
+            } />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Container>
