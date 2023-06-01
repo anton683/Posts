@@ -4,6 +4,7 @@ export const MainPage = ({
   posts,
   handlePostLike,
   handlePostDelete,
+  handlePostEdit,
   currentUser
 }) => {
   return (
@@ -12,6 +13,7 @@ export const MainPage = ({
         onPostLike={handlePostLike}
         currentUser={currentUser}
         onDelete={handlePostDelete}
+        onEdit={handlePostEdit}
       />
     </>
   );

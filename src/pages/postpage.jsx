@@ -9,8 +9,8 @@ import { NotFoundPage } from "./notfoundpage";
 import { Post } from "../component/post";
 
 export const PostPage = ({
-  handlePostLike,
   handlePostDelete,
+  handlePostEdit,
   navigate,
   setRefresh,
 }) => {
@@ -35,14 +35,14 @@ export const PostPage = ({
       .catch((err) => {
         setErrorState(err);
       });
-  }, []);
+  }, [postID]);
 
   return (
     <>
       <Container >
         <Button
           onClick={() => {
-            navigate(-1);
+            navigate("/");
             setRefresh((refresh) => !refresh);
           }}
           variant="outlined"
@@ -57,6 +57,7 @@ export const PostPage = ({
             {...post}
             onPostLike={handlePostLike}
             onDelete={handlePostDelete}
+            onEdit={handlePostEdit}
             heightImg={"auto"}
           />
         )}
